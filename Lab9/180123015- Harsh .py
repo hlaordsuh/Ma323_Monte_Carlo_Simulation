@@ -34,7 +34,7 @@ European_put=[]
 
 for simulation in range(1000):
     #Generate N~ Poisson(lambda) for the counting process N(t)
-    N=np.random.poisson(0.1,301)
+    N=np.random.poisson(0.01,301)
     #Generate Normal distribution 
     Z=np.random.normal(0,1,301)
     #generate/simulate x and then exponentiate it to generate S
@@ -47,12 +47,12 @@ for simulation in range(1000):
         if(N[i]!=0):
             LY=np.random.normal(mu,sigma,N[i])
             M=np.sum(LY)
-        x=X[-1]+E+sigma*Z[i]+M
+        x=X[-1]+E*0.1+sigma*Z[i]*.316+M
         X.append(x)
     #Exponentiate X to get S
     S=np.exp(X)
     #append both the arrays with appropriate values/payoffs of both the put options according to their payoff formulae
-    Asian_put.append(np.maximum(0,K-np.sum(S)/301))
+    Asian_put.append(np.maximum(0,K-(np.sum(S)/301)))
     European_put.append(np.maximum(0,K-S[-2]))
 
 #calculate the sample mean and sample variance of the Asian put option calculated without using control variate (mu_cap and var_cap as asked in the question)
@@ -64,8 +64,8 @@ M=1000
 
 #confidence interval
 ci=[]
-ci.append(mu_cap-((1.96*var_cap)/np.sqrt(M)))
-ci.append(mu_cap+((1.96*var_cap)/np.sqrt(M)))
+ci.append(mu_cap-((1.96*np.sqrt(var_cap))/np.sqrt(M)))
+ci.append(mu_cap+((1.96*np.sqrt(var_cap))/np.sqrt(M)))
 
 #sample mean and variance of European option 
 sample_mean_Ep=np.mean(European_put)
@@ -88,8 +88,14 @@ for i in range(1000):
 mu_with_control_variate=np.mean(Ap_with_control_variate)
 var_with_control_variate=np.var(Ap_with_control_variate)
 
+#confidence interval after using control variate
+ci2=[]
+ci2.append(mu_with_control_variate-((1.96*np.sqrt(var_with_control_variate))/np.sqrt(M)))
+ci2.append(mu_with_control_variate+((1.96*np.sqrt(var_with_control_variate))/np.sqrt(M)))
+
 print("Mean of the price of avg price Asian put option calculated without using control variate is:",mu_cap )
 print("Variance of the price of avg price Asian put option calculated without using control variate is:", var_cap)
-print("Confidence Interval: [",ci[0],",",ci[1],"]")
+print("Confidence Interval without using the control variate: [",ci[0],",",ci[1],"]")
 print("Mean of the same avg price Asian put option calculated by using the price of an European put as the control variate is:", mu_with_control_variate)
 print("Variance of the same avg price Asian put option calculated by using the price of an European put as the control variate is:", var_with_control_variate)
+print("Confidence Interval without using the control variate after using control variate: [",ci2[0],",",ci2[1],"]")
